@@ -23,3 +23,5 @@
 ```
 - In AWS apply the `least privilege principle (최소 권한 원칙)`
   - don't give more permissions than a user needs 
+
+- `Group` 단위로 권한을 부여한 후 해당 `Group`에 `User`를 추가하는 것이 권한 관리에 용이하다.
