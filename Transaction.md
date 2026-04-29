@@ -145,19 +145,25 @@ COMMIT;
 - 그리고 메서드 실행이 종료된다면 
 ```text
  메서드 정상 종료
-    → TransactionManager.commit()
-    → Connection.commit()  ← JDBC API 호출
-    → Oracle Net Protocol로 COMMIT 명령 전송
-    → Oracle DB 엔진이 redo log flush + 락 해제
+  → TransactionManager.commit()
+  → Connection.commit()
+  → MySQL Protocol로 COMMIT 요청 전송
+  → Aurora MySQL Writer가 commit 처리
+  → redo log record를 Aurora cluster volume에 기록
+  → storage quorum 달성 후 durable commit
+  → InnoDB lock 해제
 ```
 
 예외 발생 시
 ```text
   RuntimeException 발생
-    → TransactionManager.rollback()
-    → Connection.rollback()        ← JDBC API 호출
-    → Oracle Net Protocol로 ROLLBACK 명령 전송
-    → Oracle DB 엔진이 undo 적용 + 락 해제
+  → TransactionManager.rollback()
+  → Connection.rollback()
+  → MySQL Protocol로 ROLLBACK 요청 전송
+  → Aurora MySQL Writer가 rollback 처리
+  → InnoDB undo log 기반으로 변경 취소
+  → 필요한 redo log record를 Aurora cluster volume에 기록
+  → InnoDB lock 해제
 ```
 
 추상화 계층을 관통하는 전체 그림
