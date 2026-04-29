@@ -11,11 +11,11 @@ TransactionInterceptor (AOP 프록시)
 ↓
 PlatformTransactionManager (추상화)
 ↓
-┌──────────────┬──────────────┬──────────────┐
-│ DataSource   │ JpaTransaction│ R2dbc        │
-│ TxManager    │ Manager       │ TxManager    │
-│ (JDBC)       │ (Hibernate)   │ (Reactive)   │
-└──────────────┴──────────────┴──────────────┘
+┌──────────────┬────────────────┬──────────────┐
+│ DataSource   │ JpaTransaction │ R2dbc        │
+│ TxManager    │ Manager        │ TxManager    │
+│ (JDBC)       │ (Hibernate)    │ (Reactive)   │
+└──────────────┴────────────────┴──────────────┘
 ```
 - `PlatformTransactionManager`는 Spring Framework의 `spring-tx` 모듈에 정의된 인터페이스이며, `getTransaction(), commit(), rollback()` 3개 메서드만 가지고 있다.
 
@@ -60,7 +60,7 @@ public class OrderService {
 - `Why?`: this.saveOrder()는 프록시 객체가 아닌 실제 객체의 메서드를 직접 호출하기 때문 (Spring AOP가 JDK Dynamic Proxy 또는 CGLIB 프록시로 동작하는 구조적 한계)
 - `Solution`: `트랜잭션이 필요한 메서드를 별도 빈(클래스)으로 분리`하거나, `ApplicationContext에서 자기 자신의 프록시를 주입받는 방식`을 쓴다.
 
-**###`ApplicationContext에서 자기 자신의 프록시를 주입받는 방식` 예제 ###**
+**%%%`ApplicationContext에서 자기 자신의 프록시를 주입받는 방식` 예제 %%%**
 ```java
 @Service
 public class ExampleService {
